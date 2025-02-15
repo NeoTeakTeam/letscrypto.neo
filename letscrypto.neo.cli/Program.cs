@@ -1,6 +1,6 @@
-﻿using letscrypto.neo.core;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.CommandLine;
+using letscrypto.neo.core;
 
 Core coreInstance = new();
 
@@ -15,21 +15,29 @@ void GenerateKey(int count, string save)
         int n = 1;
 
         // 使用 Parallel.For 来并行生成密钥
-        Parallel.For(0, count, i =>
-        {
-            Console.Write($"Generated key {n} of {count}{new string(' ', count.ToString().Length)}\r");
-            // 每个线程生成一个部分密钥
-            string partialKey = coreInstance.GenerateKeyStep();
-            partialKeys.Add(partialKey); // 将部分密钥添加到集合中
-            n += 1;
-        });
+        Parallel.For(
+            0,
+            count,
+            i =>
+            {
+                Console.Write(
+                    $"Generated key {n} of {count}{new string(' ', count.ToString().Length)}\r"
+                );
+                // 每个线程生成一个部分密钥
+                string partialKey = coreInstance.GenerateKeyStep();
+                partialKeys.Add(partialKey); // 将部分密钥添加到集合中
+                n += 1;
+            }
+        );
 
         // 将所有部分密钥合并成最终的密钥
         key = string.Join("", partialKeys);
         key += new Random().Next(0, 10).ToString();
 
         // 输出进度信息
-        Console.WriteLine($"Generated key {count} of {count}{new string(' ', count.ToString().Length)}");
+        Console.WriteLine(
+            $"Generated key {count} of {count}{new string(' ', count.ToString().Length)}"
+        );
     }
     else if (count < 100)
     {
@@ -56,7 +64,9 @@ void GenerateKey(int count, string save)
 
 void RandomOffset(int min, int max)
 {
-    Console.WriteLine($"Random offset between {min} and {max}: {coreInstance.RandomOffset(min, max)}");
+    Console.WriteLine(
+        $"Random offset between {min} and {max}: {coreInstance.RandomOffset(min, max)}"
+    );
 }
 
 void LoadKey(string keyFile)
@@ -76,7 +86,15 @@ void LoadKey(string keyFile)
     Console.WriteLine($"Loaded key from {keyFile}:\n{coreInstance.LoadKey(tempKey)}");
 }
 
-void Encrypt(string text, string file, string key, string keyFile, int offset, string save, string saveKey)
+void Encrypt(
+    string text,
+    string file,
+    string key,
+    string keyFile,
+    int offset,
+    string save,
+    string saveKey
+)
 {
     if (string.IsNullOrEmpty(text) && string.IsNullOrEmpty(file))
     {
@@ -262,14 +280,26 @@ void Decrypt(string text, string file, string key, string keyFile, int offset, s
 
 var RootCommand = new RootCommand("Let's encrypt together!");
 
-var GenerateKeyCountOption = new Option<int>(["-c", "--count"], () => 20, description: "Number of keys to generate");
+var GenerateKeyCountOption = new Option<int>(
+    ["-c", "--count"],
+    () => 20,
+    description: "Number of keys to generate"
+);
 var GenerateKeySaveOption = new Option<string>(["-s", "--save"], description: "Save key to file");
 var GenerateKeyCommand = new Command("generate-key", "Generates a key");
 GenerateKeyCommand.AddOption(GenerateKeyCountOption);
 GenerateKeyCommand.AddOption(GenerateKeySaveOption);
 
-var RandomOffsetMinOption = new Option<int>(["-m", "--min"], () => 3, description: "Minimum offset");
-var RandomOffsetMaxOption = new Option<int>(["-M", "--max"], () => 32, description: "Maximum offset");
+var RandomOffsetMinOption = new Option<int>(
+    ["-m", "--min"],
+    () => 3,
+    description: "Minimum offset"
+);
+var RandomOffsetMaxOption = new Option<int>(
+    ["-M", "--max"],
+    () => 32,
+    description: "Maximum offset"
+);
 var RandomOffsetCommand = new Command("random-offset", description: "Generates a random offset");
 RandomOffsetCommand.AddOption(RandomOffsetMinOption);
 RandomOffsetCommand.AddOption(RandomOffsetMaxOption);
@@ -279,10 +309,22 @@ var PrintVersionCommand = new Command("version", description: "Print version and
 var EncryptTextOption = new Option<string>(["-t", "--text"], description: "Text to encrypt");
 var EncryptFileOption = new Option<string>(["-f", "--file"], description: "File to encrypt");
 var EncryptKeyOption = new Option<string>(["-k", "--key"], description: "Key to encrypt with");
-var EncryptKeyFileOption = new Option<string>(["-K", "--key-file"], description: "Key file to encrypt with");
-var EncryptOffsetOption = new Option<int>(["-o", "--offset"], description: "Offset to encrypt with");
-var EncryptSaveOption = new Option<string>(["-s", "--save"], description: "File to save encrypted text to");
-var EncryptSaveKeyOption = new Option<string>(["-S", "--save-key"], description: "File to save key to when key is generated");
+var EncryptKeyFileOption = new Option<string>(
+    ["-K", "--key-file"],
+    description: "Key file to encrypt with"
+);
+var EncryptOffsetOption = new Option<int>(
+    ["-o", "--offset"],
+    description: "Offset to encrypt with"
+);
+var EncryptSaveOption = new Option<string>(
+    ["-s", "--save"],
+    description: "File to save encrypted text to"
+);
+var EncryptSaveKeyOption = new Option<string>(
+    ["-S", "--save-key"],
+    description: "File to save key to when key is generated"
+);
 var EncryptCommand = new Command("encrypt", description: "Encrypts a text or a file");
 EncryptCommand.AddOption(EncryptTextOption);
 EncryptCommand.AddOption(EncryptFileOption);
@@ -295,9 +337,18 @@ EncryptCommand.AddOption(EncryptSaveKeyOption);
 var DecryptTextOption = new Option<string>(["-t", "--text"], description: "Text to decrypt");
 var DecryptFileOption = new Option<string>(["-f", "--file"], description: "File to decrypt");
 var DecryptKeyOption = new Option<string>(["-k", "--key"], description: "Key to decrypt with");
-var DecryptKeyFileOption = new Option<string>(["-K", "--key-file"], description: "Key file to decrypt with");
-var DecryptOffsetOption = new Option<int>(["-o", "--offset"], description: "Offset to decrypt with");
-var DecryptSaveOption = new Option<string>(["-s", "--save"], description: "File to save decrypted text to");
+var DecryptKeyFileOption = new Option<string>(
+    ["-K", "--key-file"],
+    description: "Key file to decrypt with"
+);
+var DecryptOffsetOption = new Option<int>(
+    ["-o", "--offset"],
+    description: "Offset to decrypt with"
+);
+var DecryptSaveOption = new Option<string>(
+    ["-s", "--save"],
+    description: "File to save decrypted text to"
+);
 var DecryptCommand = new Command("decrypt", description: "Decrypts a text or a file");
 DecryptCommand.AddOption(DecryptTextOption);
 DecryptCommand.AddOption(DecryptFileOption);

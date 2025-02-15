@@ -74,7 +74,10 @@ namespace letscrypto.neo.gui.winform
 
         private void OffsetRandomGenerate_Click(object sender, EventArgs e)
         {
-            if (int.TryParse(OffsetRandomMin.Text, out int min) && int.TryParse(OffsetRandomMax.Text, out int max))
+            if (
+                int.TryParse(OffsetRandomMin.Text, out int min)
+                && int.TryParse(OffsetRandomMax.Text, out int max)
+            )
             {
                 if (max < min)
                 {
@@ -176,7 +179,6 @@ namespace letscrypto.neo.gui.winform
                 return;
             }
 
-
             var realText = "";
             if (textMode == "file")
             {
@@ -243,7 +245,6 @@ namespace letscrypto.neo.gui.winform
                 return;
             }
 
-
             var realText = "";
             if (textMode == "file")
             {
@@ -301,7 +302,6 @@ namespace letscrypto.neo.gui.winform
         {
             Clipboard.SetText("https://github.com/AImixAE");
             MessageBox.Show("Github link copied to clipboard", "Success");
-
         }
 
         private void AImixAEMochaWebsite_Click(object sender, EventArgs e)

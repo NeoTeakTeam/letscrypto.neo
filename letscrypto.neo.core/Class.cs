@@ -43,7 +43,9 @@ namespace letscrypto.neo.core
 
             using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(now + randomNumber.ToString() + curDir + pid));
+                byte[] hashBytes = sha256.ComputeHash(
+                    Encoding.UTF8.GetBytes(now + randomNumber.ToString() + curDir + pid)
+                );
                 result += BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
             }
 
@@ -59,19 +61,28 @@ namespace letscrypto.neo.core
             int n = 1;
 
             // 使用 Parallel.For 来并行生成密钥
-            Parallel.For(0, count, i =>
-            {
-                string now = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-                int randomNumber = random.Next(0, max + 1);
-
-                using (SHA256 sha256 = SHA256.Create())
+            Parallel.For(
+                0,
+                count,
+                i =>
                 {
-                    byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(now + randomNumber.ToString() + curDir + pid));
-                    string partialKey = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-                    partialKeys.Add(partialKey);
+                    string now = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                    int randomNumber = random.Next(0, max + 1);
+
+                    using (SHA256 sha256 = SHA256.Create())
+                    {
+                        byte[] hashBytes = sha256.ComputeHash(
+                            Encoding.UTF8.GetBytes(now + randomNumber.ToString() + curDir + pid)
+                        );
+                        string partialKey = BitConverter
+                            .ToString(hashBytes)
+                            .Replace("-", "")
+                            .ToLower();
+                        partialKeys.Add(partialKey);
+                    }
+                    n += 1;
                 }
-                n += 1;
-            });
+            );
 
             // 将所有部分密钥合并成最终的密钥
             result = string.Join("", partialKeys);
@@ -83,13 +94,18 @@ namespace letscrypto.neo.core
         public string FormatKey(string key)
         {
             string res = "";
-            res += new string('-', FORMAT_KEY_LENGTH) + " Key " + new string('-', FORMAT_KEY_LENGTH) + "\n";
+            res +=
+                new string('-', FORMAT_KEY_LENGTH)
+                + " Key "
+                + new string('-', FORMAT_KEY_LENGTH)
+                + "\n";
             for (int i = 0; i < key.Length; i += FORMAT_KEY_LENGTH * 2 + 5)
             {
                 res += key.Substring(i, Math.Min(FORMAT_KEY_LENGTH * 2 + 5, key.Length - i)) + "\n";
             }
 
-            res += new string('-', FORMAT_KEY_LENGTH) + " End " + new string('-', FORMAT_KEY_LENGTH);
+            res +=
+                new string('-', FORMAT_KEY_LENGTH) + " End " + new string('-', FORMAT_KEY_LENGTH);
             return res;
         }
 
@@ -97,16 +113,27 @@ namespace letscrypto.neo.core
         {
             // Remove the header and footer and return as a string
             return key.Substring(
-                FORMAT_KEY_LENGTH * 2 + " Key ".Length,
-                key.Length - (FORMAT_KEY_LENGTH * 2 + " End ".Length) * 2
-            ).Replace("\n", "");
+                    FORMAT_KEY_LENGTH * 2 + " Key ".Length,
+                    key.Length - (FORMAT_KEY_LENGTH * 2 + " End ".Length) * 2
+                )
+                .Replace("\n", "");
         }
 
         public bool CheckKey(string key)
         {
             // Check the header and footer
-            if (!key.StartsWith(new string('-', FORMAT_KEY_LENGTH) + " Key " + new string('-', FORMAT_KEY_LENGTH)) ||
-                !key.EndsWith(new string('-', FORMAT_KEY_LENGTH) + " End " + new string('-', FORMAT_KEY_LENGTH)))
+            if (
+                !key.StartsWith(
+                    new string('-', FORMAT_KEY_LENGTH)
+                        + " Key "
+                        + new string('-', FORMAT_KEY_LENGTH)
+                )
+                || !key.EndsWith(
+                    new string('-', FORMAT_KEY_LENGTH)
+                        + " End "
+                        + new string('-', FORMAT_KEY_LENGTH)
+                )
+            )
             {
                 return false;
             }
